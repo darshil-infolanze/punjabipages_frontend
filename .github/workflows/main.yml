@@ -1,0 +1,43 @@
+name: punjabi-frontend
+
+on:
+  push:
+    branches: [ "main" ]
+
+jobs:
+  build:
+    runs-on: self-hosted
+    strategy:
+      matrix:
+        node-version: [20.x]
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Use Node.js ${{ matrix.node-version }}
+      uses: actions/setup-node@v4
+      with:
+        node-version: ${{ matrix.node-version }}
+        cache: 'npm'
+
+    - name: Install Dependencies
+      run: npm ci
+
+    - name: Build Website
+      run: npm run build
+
+    - name: Deploy Website
+      run: |
+        rm -rf /var/www/punjabi-website/*
+        cp -r dist/* /var/www/punjabi-website/
+
+    - name: Build Admin Panel
+      run: |
+        cd admin
+        npm ci
+        npm run build
+
+    - name: Deploy Admin Panel
+      run: |
+        rm -rf /var/www/punjabi-admin/*
+        cp -r admin/dist/* /var/www/punjabi-admin/
