@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { FaSearch } from "react-icons/fa";
-import { FiPlus } from "react-icons/fi";
+import { FiChevronLeft, FiChevronRight, FiPlus } from "react-icons/fi";
 import { useDispatch, useSelector } from "react-redux";
 import {
   featureBussiness,
@@ -17,11 +17,14 @@ function Business() {
   const { BusinessCategory, loading } = useSelector(
     (state) => state.business
   );
+  const [currentPage, setCurrentPage] = useState(1);
   const [status, setStatus] = useState(true);
+  const totalPages = BusinessCategory?.pagination?.pages || 1;
 
   useEffect(() => {
-    dispatch(getBusinessCategory({ keyword: "", page: 1, status }));
-  }, [dispatch, status]);
+    dispatch(getBusinessCategory({ page: currentPage, status }));
+  }, [dispatch, status, currentPage]);
+
 
   const businesses = BusinessCategory?.businesses;
   console.log("Bussiness", businesses);
@@ -38,6 +41,7 @@ function Business() {
   const [selectedFeatureBiz, setSelectedFeatureBiz] = useState(null);
   const [selectedPopularBiz, setSelectedPopularBiz] = useState(null);
   const [popularModalOpen, setPopularModalOpen] = useState(false);
+
 
   const handleCheckboxClick = (e, biz) => {
     e.preventDefault();
@@ -384,6 +388,55 @@ function Business() {
               </table>
             </div>
           )}
+          <div className="flex justify-end pe-5 items-center gap-2 py-5 bg-slate-50 border-t border-slate-200">
+            {/* Prev Button */}
+            <button
+              onClick={() => setCurrentPage((p) => Math.max(p - 1, 1))}
+              disabled={currentPage === 1}
+              className="px-3 py-1 rounded-lg bg-gray-100 text-gray-700 disabled:opacity-50 hover:bg-gray-200"
+            >
+              <FiChevronLeft size={18} />
+            </button>
+
+            {/* Page Numbers with Ellipsis */}
+            {Array.from({ length: totalPages }, (_, i) => i + 1)
+              .filter((page) => {
+                return (
+                  page === 1 || // Always show first page
+                  page === totalPages || // Always show last page
+                  (page >= currentPage - 1 && page <= currentPage + 1) // Show current, prev, next
+                );
+              })
+              .map((page, index, arr) => {
+                const prevPage = arr[index - 1];
+                const showEllipsis = prevPage && page - prevPage > 1;
+
+                return (
+                  <React.Fragment key={page}>
+                    {showEllipsis && <span className="px-2">...</span>}
+                    <button
+                      onClick={() => setCurrentPage(page)}
+                      className={`px-3 py-1 rounded-lg ${currentPage === page
+                          ? "bg-blue-600 text-white shadow"
+                          : "bg-gray-100 text-gray-700 hover:bg-gray-200"
+                        }`}
+                    >
+                      {page}
+                    </button>
+                  </React.Fragment>
+                );
+              })}
+
+            {/* Next Button */}
+            <button
+              onClick={() => setCurrentPage((p) => Math.min(p + 1, totalPages))}
+              disabled={currentPage === totalPages}
+              className="px-3 py-1 rounded-lg bg-gray-100 text-gray-700 disabled:opacity-50 hover:bg-gray-200"
+            >
+              <FiChevronRight size={18} />
+            </button>
+          </div>
+
         </div>
 
         {/* Modal */}
