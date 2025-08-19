@@ -3,8 +3,9 @@ import { store } from "./store";
 
 const axiosConfig = axios.create({
   // baseURL: 'http://localhost:3000/api/',
-  baseURL: 'https://punjabipages-backend.vercel.app/api/',
+  // baseURL: 'https://punjabipages-backend.vercel.app/api/',
   // baseURL: 'https://3.27.63.238/api/api/',
+  baseURL: 'https://server.punjabipages.com.au/api/api',
   headers: {
     "Content-Type": "application/json",
   },
