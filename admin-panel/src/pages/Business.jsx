@@ -313,7 +313,7 @@ function Business() {
                         {biz.subCategory}
                       </td>
                       <td className="px-4 py-4 whitespace-nowrap text-slate-600">
-                        {biz.email}
+                        {biz?.alternateContacts?.email}
                       </td>
                       <td className="py-2 whitespace-nowrap text-slate-600 text-center">
                         <input
@@ -417,8 +417,8 @@ function Business() {
                     <button
                       onClick={() => setCurrentPage(page)}
                       className={`px-3 py-1 rounded-lg ${currentPage === page
-                          ? "bg-blue-600 text-white shadow"
-                          : "bg-gray-100 text-gray-700 hover:bg-gray-200"
+                        ? "bg-blue-600 text-white shadow"
+                        : "bg-gray-100 text-gray-700 hover:bg-gray-200"
                         }`}
                     >
                       {page}
@@ -461,7 +461,7 @@ function Business() {
                 </div>
                 <button
                   onClick={closeModal}
-                  className="p-2 text-slate-400 hover:text-slate-600 hover:bg-slate-100 rounded-lg transition-colors duration-200"
+                  className="p-2 text-slate-600 bg-slate-100 hover:text-white hover:bg-red-300 rounded-lg transition-colors duration-200"
                 >
                   <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
@@ -496,16 +496,16 @@ function Business() {
                     <div className="space-y-2 text-sm">
                       <div className="flex justify-between">
                         <span className="text-slate-600">ABN:</span>
-                        <span className="font-medium text-slate-800">{selectedBusiness.abn}</span>
+                        <span className="font-medium text-slate-800">{selectedBusiness.abn || "-"}</span>
                       </div>
                       <div className="flex justify-between">
                         <span className="text-slate-600">Established:</span>
-                        <span className="font-medium text-slate-800">{selectedBusiness.establishedYear}</span>
+                        <span className="font-medium text-slate-800">{selectedBusiness.establishedYear || "-"}</span>
                       </div>
                       <div className="flex justify-between">
                         <span className="text-slate-600">Website:</span>
                         <a href={selectedBusiness.website} target="_blank" rel="noreferrer" className="font-medium text-blue-600 hover:text-blue-700 hover:underline">
-                          {selectedBusiness.website}
+                          {selectedBusiness.website || "-"}
                         </a>
                       </div>
                     </div>
@@ -533,8 +533,8 @@ function Business() {
                   setActiveTab={setActiveTab}
                 />
                 <TabButton
-                  id="keywords"
-                  label="Keywords"
+                  id="Services"
+                  label="Services"
                   activeTab={activeTab}
                   setActiveTab={setActiveTab}
                 />
@@ -553,14 +553,14 @@ function Business() {
                     <div className="bg-gradient-to-br from-slate-50 to-blue-50 rounded-xl p-4 border border-slate-200">
                       <h3 className="font-semibold text-slate-900 mb-3">Description</h3>
                       <p className="text-sm text-slate-700 leading-relaxed">
-                        {selectedBusiness.description}
+                        {selectedBusiness.description || "-"}
                       </p>
                     </div>
 
                     <div className="bg-gradient-to-br from-slate-50 to-blue-50 rounded-xl p-4 border border-slate-200">
                       <h3 className="font-semibold text-slate-900 mb-3">Promotions</h3>
                       <p className="text-sm text-slate-700 leading-relaxed">
-                        {selectedBusiness.promotions}
+                        {selectedBusiness.promotions || "-"}
                       </p>
                     </div>
                   </div>
@@ -571,7 +571,7 @@ function Business() {
                     <div className="bg-gradient-to-br from-slate-50 to-blue-50 rounded-xl p-4 border border-slate-200">
                       <h3 className="font-semibold text-slate-900 mb-3">Address</h3>
                       <p className="text-sm text-slate-700">
-                        {selectedBusiness.address?.street}, {selectedBusiness.address?.suburb}, {selectedBusiness.address?.state} {selectedBusiness.address?.postcode}
+                        {selectedBusiness.address?.street}, {selectedBusiness.address?.suburb || selectedBusiness.address?.city}, {selectedBusiness.address?.state} {selectedBusiness.address?.postcode}
                       </p>
                     </div>
 
@@ -600,35 +600,121 @@ function Business() {
 
                 {/* Add other tab contents as needed */}
                 {activeTab === "gallery" && (
-                  <div className="text-center py-8">
-                    <div className="w-16 h-16 bg-gradient-to-br from-slate-100 to-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                      <svg className="w-8 h-8 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                      </svg>
-                    </div>
-                    <p className="text-slate-600">Gallery content will be displayed here</p>
+                  <div className="space-y-6">
+                    {/* Gallery */}
+                    {selectedBusiness.gallery && selectedBusiness.gallery.length > 0 ? (
+                      <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+                        {selectedBusiness.gallery.map((img, index) => (
+                          <div key={index} className="relative group">
+                            <img
+                              src={img}
+                              alt={`Gallery ${index + 1}`}
+                              className="rounded-xl w-full h-48 object-cover shadow-sm group-hover:opacity-90 transition"
+                            />
+                          </div>
+                        ))}
+                      </div>
+                    ) : (
+                      <p className="text-slate-600 text-center">No gallery images available</p>
+                    )}
+
+                    {/* Intro Video */}
+                    {selectedBusiness.introVideo ? (
+                      <div className="mt-6">
+                        <h3 className="font-semibold text-slate-900 mb-3">Intro Video</h3>
+                        <video
+                          controls
+                          className="w-full max-h-96 rounded-xl border border-slate-200 shadow-sm"
+                        >
+                          <source src={selectedBusiness.introVideo} type="video/mp4" />
+                          Your browser does not support the video tag.
+                        </video>
+                      </div>
+                    ) : (
+                      <p className="text-slate-600 text-center">No intro video available</p>
+                    )}
                   </div>
                 )}
 
-                {activeTab === "keywords" && (
-                  <div className="text-center py-8">
-                    <div className="w-16 h-16 bg-gradient-to-br from-slate-100 to-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                      <svg className="w-8 h-8 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z" />
-                      </svg>
+                {activeTab === "Services" && (
+                  <div className="space-y-4">
+                    <div className="bg-gradient-to-br from-slate-50 to-blue-50 rounded-xl p-4 border border-slate-200">
+                      <h3 className="font-semibold text-slate-900 mb-3">services</h3>
+                      {selectedBusiness.services &&
+                        selectedBusiness.services.length > 0 ? (
+                        <ul className="list-disc list-inside text-slate-700">
+                          {selectedBusiness.services.map((method, i) => (
+                            <li key={i}>{method}</li>
+                          ))}
+                        </ul>
+                      ) : (
+                        <p className="text-slate-600">No services listed</p>
+                      )}
                     </div>
-                    <p className="text-slate-600">Keywords content will be displayed here</p>
+                    <div className="bg-gradient-to-br from-slate-50 to-blue-50 rounded-xl p-4 border border-slate-200">
+                      <h3 className="font-semibold text-slate-900 mb-3">service Areas</h3>
+                      {selectedBusiness.serviceAreas &&
+                        selectedBusiness.serviceAreas.length > 0 ? (
+                        <ul className="list-disc list-inside text-slate-700">
+                          {selectedBusiness.serviceAreas.map((method, i) => (
+                            <li key={i}>{method}</li>
+                          ))}
+                        </ul>
+                      ) : (
+                        <p className="text-slate-600">No service area listed</p>
+                      )}
+                    </div>
+                    <div className="bg-gradient-to-br from-slate-50 to-blue-50 rounded-xl p-4 border border-slate-200">
+                      <h3 className="font-semibold text-slate-900 mb-3">Keywords</h3>
+                      {selectedBusiness.keywords && selectedBusiness.keywords.length > 0 ? (
+                        <div className="flex flex-wrap gap-2">
+                          {selectedBusiness.keywords.map((kw, idx) => (
+                            <span
+                              key={idx}
+                              className="px-3 py-1 bg-blue-100 text-blue-800 text-sm font-medium rounded-full"
+                            >
+                              {kw}
+                            </span>
+                          ))}
+                        </div>
+                      ) : (
+                        <p className="text-slate-600">No keywords available</p>
+                      )}
+                    </div>
                   </div>
                 )}
 
                 {activeTab === "payment" && (
-                  <div className="text-center py-8">
-                    <div className="w-16 h-16 bg-gradient-to-br from-slate-100 to-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                      <svg className="w-8 h-8 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z" />
-                      </svg>
+                  <div className="space-y-6">
+                    {/* Payment Methods */}
+                    <div className="bg-gradient-to-br from-slate-50 to-blue-50 rounded-xl p-4 border border-slate-200">
+                      <h3 className="font-semibold text-slate-900 mb-3">Payment Methods</h3>
+                      {selectedBusiness.paymentMethods &&
+                        selectedBusiness.paymentMethods.length > 0 ? (
+                        <ul className="list-disc list-inside text-slate-700">
+                          {selectedBusiness.paymentMethods.map((method, i) => (
+                            <li key={i}>{method}</li>
+                          ))}
+                        </ul>
+                      ) : (
+                        <p className="text-slate-600">No payment methods listed</p>
+                      )}
                     </div>
-                    <p className="text-slate-600">Payment & certifications content will be displayed here</p>
+
+                    {/* Certifications */}
+                    <div className="bg-gradient-to-br from-slate-50 to-blue-50 rounded-xl p-4 border border-slate-200">
+                      <h3 className="font-semibold text-slate-900 mb-3">Certifications</h3>
+                      {selectedBusiness.certifications &&
+                        selectedBusiness.certifications.length > 0 ? (
+                        <ul className="list-disc list-inside text-slate-700">
+                          {selectedBusiness.certifications.map((cert, i) => (
+                            <li key={i}>{cert}</li>
+                          ))}
+                        </ul>
+                      ) : (
+                        <p className="text-slate-600">No certifications available</p>
+                      )}
+                    </div>
                   </div>
                 )}
               </div>

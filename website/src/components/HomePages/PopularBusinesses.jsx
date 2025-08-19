@@ -4,56 +4,6 @@ import { useDispatch, useSelector } from "react-redux"
 import { Link } from "react-router-dom"
 import { getPopularBusiness } from "../../redux/features/businessSlice";
 
-const businesses = [
-  {
-    id: 1,
-    name: "Singh's Authentic Kitchen",
-    image:
-      "https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80",
-    category: "Restaurant",
-    rating: 4.8,
-    reviews: 124,
-    isPremium: true,
-    isVerified: true,
-    location: "Melbourne, VIC",
-  },
-  {
-    id: 2,
-    name: "Kaur Beauty Salon",
-    image: "https://images.unsplash.com/photo-1560066984-138dadb4c035?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80",
-    category: "Beauty & Wellness",
-    rating: 4.9,
-    reviews: 89,
-    isPremium: true,
-    isVerified: true,
-    location: "Sydney, NSW",
-  },
-  {
-    id: 3,
-    name: "Punjab Grocery Store",
-    image:
-      "https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80",
-    category: "Grocery",
-    rating: 4.7,
-    reviews: 156,
-    isPremium: false,
-    isVerified: true,
-    location: "Brisbane, QLD",
-  },
-  {
-    id: 4,
-    name: "Guru Nanak Driving School",
-    image:
-      "https://images.unsplash.com/photo-1449824913935-59a10b8d2000?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80",
-    category: "Education",
-    rating: 4.6,
-    reviews: 78,
-    isPremium: true,
-    isVerified: true,
-    location: "Perth, WA",
-  },
-]
-
 export function PopularBusinesses() {
   const dispatch = useDispatch();
 
@@ -85,7 +35,7 @@ export function PopularBusinesses() {
                   <img
                     src={business.logoUrl || "/placeholder.svg"}
                     alt={business.businessName}
-                    className="w-full h-36 sm:h-40 md:h-48 object-cover"
+                    className="w-full h-60 sm:h-60 md:h-48 object-cover"
                   />
                   <div className="absolute top-2 sm:top-3 left-2 sm:left-3 flex gap-1 sm:gap-2">
                     {business.isPremium && (

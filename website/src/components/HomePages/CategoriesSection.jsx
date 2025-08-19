@@ -22,7 +22,7 @@ export default function CategoriesSection() {
 
   return (
     <>
-      <section className="relative py-14 overflow-hidden">
+      <section className="relative py-7 overflow-hidden">
         {/* Abstract Background Blobs */}
         <div className="absolute -top-32 -left-32 w-[400px] h-[400px] bg-[--main-color] rounded-full mix-blend-multiply filter blur-3xl opacity-10 animate-pulse z-0"></div>
         <div className="absolute -bottom-20 -right-20 w-[300px] h-[300px] bg-[--main-color] rounded-full mix-blend-multiply filter blur-2xl opacity-10 animate-spin-slow z-0"></div>
@@ -30,13 +30,13 @@ export default function CategoriesSection() {
 
         {/* Content Container */}
         <div className="max-w-7xl mx-auto px-4 md:px-8 relative z-10">
-          <div className="text-center mb-16">
+          <div className="text-center mb-10">
             <div className="inline-block relative">
-              <h2 className="text-2xl md:text-4xl font-semibold text-[--main-color] mb-6 tracking-tight">
+              <h2 className="text-2xl md:text-4xl font-semibold text-[--main-color] mb-1.5 tracking-tight">
                 Browse by Category
               </h2>
             </div>
-            <p className="text-sm sm:text-base text-gray-600 max-w-3xl mx-auto leading-relaxed">
+            <p className="text-xs sm:text-sm text-gray-600 max-w-3xl mx-auto leading-relaxed">
               Discover premium community services with trusted professionals worldwide
             </p>
           </div>

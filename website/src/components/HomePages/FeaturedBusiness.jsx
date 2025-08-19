@@ -57,7 +57,7 @@ const FeaturedBusiness = () => {
                     <img
                       src={business.logoUrl || "/placeholder.svg"}
                       alt={business.businessName}
-                      className="w-full h-36 sm:h-40 md:h-48 object-cover"
+                      className="w-full h-60 sm:h-60 md:h-48 object-cover"
                     />
                     <div className="absolute top-2 sm:top-3 left-2 sm:left-3 flex gap-1 sm:gap-2">
                       {business.isFeature && (

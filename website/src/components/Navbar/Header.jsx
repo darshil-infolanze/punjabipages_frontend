@@ -3,20 +3,56 @@ import { Menu, X, Cloud, User } from "lucide-react";
 import { Button } from "@material-tailwind/react";
 import logo from "../../assets/logo.jpeg";
 import { Link, useNavigate } from "react-router-dom";
+import { useEffect } from "react";
 
 export function Header() {
   const navigate = useNavigate();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [weather, setWeather] = useState(null);
+  const [location, setLocation] = useState(null);
+
+useEffect(() => {
+  if (navigator.geolocation) {
+    navigator.geolocation.getCurrentPosition(async (pos) => {
+      const { latitude, longitude } = pos.coords;
+
+      try {
+        const apiKey = "fbe42682d13f061d214065730d9f3ad8"; // replace with correct key
+        const res = await fetch(
+          `https://api.openweathermap.org/data/2.5/weather?lat=${latitude}&lon=${longitude}&units=metric&appid=${apiKey}`
+        );
+
+        const data = await res.json();
+        console.log("res",res);
+        
+
+        if (res.ok) {
+          setWeather({
+            temp: Math.round(data.main.temp),
+            city: data.name,
+          });
+        } else {
+          console.error("Weather API error:", data);
+          setWeather(null);
+        }
+      } catch (err) {
+        console.error("Fetch failed:", err);
+        setWeather(null);
+      }
+    });
+  }
+}, []);
+
 
   return (
     <header className="w-full bg-white border-b border-gray-200">
-      <div className="container flex py-3 items-center justify-between px-4 md:px-6 lg:px-8 mx-auto max-w-7xl">
+      <div className="container flex py-1 items-center justify-between px-4 md:px-6 lg:px-8 mx-auto max-w-7xl">
         {/* Logo */}
         <div
-          className="flex items-center gap-3 cursor-pointer"
+          className="flex items-center gap-2 cursor-pointer"
           onClick={() => navigate("/")}
         >
-          <img src={logo} alt="Punjabi Pages" className="w-12 h-12" />
+          <img src={logo} alt="Punjabi Pages" className="w-14 h-14" />
           <span className="text-xl font-semibold text-[--main-color]">
             Punjabi Pages
           </span>
@@ -61,7 +97,13 @@ export function Header() {
           {/* Weather */}
           <div className="hidden md:flex items-center gap-2 text-gray-600">
             <Cloud className="h-5 w-5 text-[--main-color]" />
-            <span className="font-normal">22°C</span>
+            {weather ? (
+              <span className="font-normal">
+                {weather.temp}°C <span className="ml-1"></span>
+              </span>
+            ) : (
+              <span className="font-normal">Loading...</span>
+            )}
           </div>
 
           {/* Login Button */}
