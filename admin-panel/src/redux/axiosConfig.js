@@ -4,7 +4,7 @@ import axios from "axios";
 const axiosConfig = axios.create({
   // baseURL: "http://localhost:3000/api/",
   // baseURL: "https://punjabipages-backend.vercel.app/api/",
-  baseURL: "https://server.punjabipages.com.au/api/api/",
+  baseURL: "https://server.punjabipages.com.au/api/",
   headers: {
     "Content-Type": "application/json",
   },
