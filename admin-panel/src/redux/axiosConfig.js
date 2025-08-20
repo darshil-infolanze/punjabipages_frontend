@@ -10,6 +10,7 @@ const axiosConfig = axios.create({
   },
 });
 
+
 // Export a function to set up interceptors with the store
 export function setupAxiosInterceptors(store) {
   axiosConfig.interceptors.request.use(
