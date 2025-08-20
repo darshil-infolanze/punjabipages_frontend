@@ -5,6 +5,7 @@ import { useDispatch, useSelector } from "react-redux";
 import {
   featureBussiness,
   getBusinessCategory,
+  getPopularBusiness,
   popularBussiness,
   statusBussiness,
 } from "../redux/features/businessSlice";
@@ -14,7 +15,7 @@ import { toast } from "react-toastify";
 function Business() {
   const dispatch = useDispatch();
 
-  const { BusinessCategory, loading } = useSelector(
+  const { BusinessCategory, loading, popularBusiness } = useSelector(
     (state) => state.business
   );
   const [currentPage, setCurrentPage] = useState(1);
@@ -101,10 +102,14 @@ function Business() {
     setFeatureModalOpen(true);
   };
 
-  const handlePopularToggle = (biz) => {
+  const handlePopularToggle = async (biz) => {
     setSelectedPopularBiz(biz);
     setPopularModalOpen(true);
+
+    // after success inside modal confirm → dispatch this:
+    dispatch(getPopularBusiness());
   };
+
 
   const TabButton = ({ id, label, activeTab, setActiveTab }) => (
     <button
@@ -184,6 +189,24 @@ function Business() {
       setSelectedPopularBiz(null);
     }
   };
+
+  const handlePopularClick = (e, biz) => {
+    e.preventDefault();
+
+    const popularCount = popularBusiness.length;
+
+    if (biz.popular) {
+      // Allow unchecking
+      handlePopularToggle(biz);
+    } else if (popularCount < 4) {
+      // Allow checking if less than 4 already
+      handlePopularToggle(biz);
+    } else {
+      // Block if already 4
+      toast.warning("Only 4 businesses can be marked as popular.");
+    }
+  };
+
 
   return (
     <div className="bg-gradient-to-br from-slate-50 to-blue-50 p-6 min-h-screen">
@@ -343,28 +366,12 @@ function Business() {
                           <input
                             type="checkbox"
                             checked={biz.popular}
-                            onClick={(e) => {
-                              e.preventDefault();
-
-                              const popularCount = businesses.filter((b) => b.popular).length;
-
-                              if (biz.popular) {
-                                // Allow unchecking
-                                handlePopularToggle(biz);
-                              } else if (popularCount < 4) {
-                                // Allow checking if less than 4 already checked
-                                handlePopularToggle(biz);
-                              } else {
-                                // Show warning if limit exceeded
-                                toast.warning("Only 4 businesses can be marked as popular.");
-                              }
-                            }}
+                            onClick={(e) => handlePopularClick(e, biz)}
                             readOnly
                             className="w-4 h-4 text-blue-600 bg-slate-100 border-slate-300 rounded focus:ring-blue-500 focus:ring-2 hover:bg-blue-50 transition-colors duration-200"
                           />
                         </td>
                       )}
-
                     </tr>
                   ))}
                   {businesses?.length === 0 && (
