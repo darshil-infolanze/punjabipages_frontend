@@ -500,7 +500,7 @@ const AddProfile = () => {
                         <div className="flex items-center gap-3 mb-2">
                             <Building2 className="w-6 h-6 text-blue-600" />
                             <h2 className="text-2xl font-extrabold text-gray-800">
-                                Create Business Profile
+                                {isEdit ? "Update Business Profile" : "Create Business Profile"}
                             </h2>
                         </div>
                         <p className="text-gray-500 text-xs">
@@ -1395,7 +1395,7 @@ const AddProfile = () => {
                                                 setUploadedVideoUrl(null);
                                                 setFile(null);
                                             }}
-                                            className="absolute top-2 right-2 bg-red-500 text-white rounded-full p-1 hover:bg-red-600"
+                                            className="absolute top-2 right-2 bg-white text-gray-600 rounded-full w-7 h-7 hover:bg-red-600 hover:text-white"
                                             title="Remove Video"
                                         >
                                             ✕
@@ -1404,7 +1404,7 @@ const AddProfile = () => {
                                 )}
 
                                 <p className="text-xs text-gray-500 mt-1">
-                                    Only 1 video can be uploaded.
+                                    Only 1 video can be uploaded.(100MB)
                                 </p>
                             </section>
 
