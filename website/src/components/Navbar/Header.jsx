@@ -9,50 +9,55 @@ export function Header() {
   const navigate = useNavigate();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [weather, setWeather] = useState(null);
-  const [location, setLocation] = useState(null);
+  const [loading, setLoading] = useState(true); // track loading
+  const [timeoutReached, setTimeoutReached] = useState(false);
 
-useEffect(() => {
-  if (navigator.geolocation) {
-    navigator.geolocation.getCurrentPosition(async (pos) => {
-      const { latitude, longitude } = pos.coords;
+  useEffect(() => {
+    let timeout = setTimeout(() => {
+      setTimeoutReached(true);
+      setLoading(false);
+    }, 3000); // after 3 sec
 
-      try {
-        const apiKey = "fbe42682d13f061d214065730d9f3ad8"; // replace with correct key
-        const res = await fetch(
-          `https://api.openweathermap.org/data/2.5/weather?lat=${latitude}&lon=${longitude}&units=metric&appid=${apiKey}`
-        );
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(async (pos) => {
+        const { latitude, longitude } = pos.coords;
 
-        const data = await res.json();
-        console.log("res",res);
-        
+        try {
+          const apiKey = "fbe42682d13f061d214065730d9f3ad8";
+          const res = await fetch(
+            `https://api.openweathermap.org/data/2.5/weather?lat=${latitude}&lon=${longitude}&units=metric&appid=${apiKey}`
+          );
+          const data = await res.json();
 
-        if (res.ok) {
-          setWeather({
-            temp: Math.round(data.main.temp),
-            city: data.name,
-          });
-        } else {
-          console.error("Weather API error:", data);
-          setWeather(null);
+          if (res.ok) {
+            setWeather({
+              temp: Math.round(data.main.temp),
+              city: data.name,
+            });
+          }
+        } catch (err) {
+          console.error("Fetch failed:", err);
+        } finally {
+          clearTimeout(timeout);
+          setLoading(false);
         }
-      } catch (err) {
-        console.error("Fetch failed:", err);
-        setWeather(null);
-      }
-    });
-  }
-}, []);
+      });
+    }
+
+    return () => clearTimeout(timeout);
+  }, []);
+
 
 
   return (
     <header className="w-full bg-white border-b border-gray-200">
-      <div className="container flex py-1 items-center justify-between px-4 md:px-6 lg:px-8 mx-auto max-w-7xl">
+      <div className="flex items-center justify-between px-4 md:px-6 lg:px-8 py-1 max-w-full">
         {/* Logo */}
         <div
-          className="flex items-center gap-2 cursor-pointer"
+          className="flex items-center gap-2 cursor-pointer flex-shrink-0"
           onClick={() => navigate("/")}
         >
-          <img src={logo} alt="Punjabi Pages" className="w-14 h-14" />
+          <img src={logo} alt="Punjabi Pages" className="w-14 h-14  md:w-20 md:h-20" />
           <span className="text-xl font-semibold text-[--main-color]">
             Punjabi Pages
           </span>
@@ -97,12 +102,12 @@ useEffect(() => {
           {/* Weather */}
           <div className="hidden md:flex items-center gap-2 text-gray-600">
             <Cloud className="h-5 w-5 text-[--main-color]" />
-            {weather ? (
-              <span className="font-normal">
-                {weather.temp}°C <span className="ml-1"></span>
-              </span>
-            ) : (
+            {loading ? (
               <span className="font-normal">Loading...</span>
+            ) : weather ? (
+              <span className="font-normal">{weather.temp}°C</span>
+            ) : (
+              <span className="font-normal">--</span>
             )}
           </div>
 

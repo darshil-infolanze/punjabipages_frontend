@@ -1,12 +1,13 @@
 import { combineReducers, configureStore } from "@reduxjs/toolkit";
 import { persistReducer, persistStore } from "redux-persist";
 import storage from 'redux-persist/lib/storage';
+import storageSession from "redux-persist/lib/storage/session";
 import authReducer from './features/authSlice'
 import businessReducer from "./features/businessSlice"
 
 const persistConfig = {
     key: 'root',
-    storage,
+    storage:storageSession,
     whitelist: ['auth']
 };
 
