@@ -15,10 +15,10 @@ export default function CategoriesSection() {
   const [hoveredIndex, setHoveredIndex] = useState(null);
 
 
-   const handleCategoryClick = async (categoryName) => {
-    await dispatch(getBusinessCategory({ category: categoryName }));
-    navigate("/business-details", { state: { selectedCategory: categoryName } });
-  };
+  // const handleCategoryClick = async (categoryName) => {
+  //   await dispatch(getBusinessCategory({ category: categoryName }));
+  //   navigate("/business-details", { state: { selectedCategory: categoryName } });
+  // };
 
   return (
     <>
@@ -44,12 +44,16 @@ export default function CategoriesSection() {
           {/* Category Cards */}
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8 px-4 md:px-8 lg:px-16">
             {categories.map((category, index) => (
-              <div
+              <Link
                 key={index}
+                to="/business-details"
+                state={{ selectedCategory: category.category }}
+                onClick={() =>
+                  dispatch(getBusinessCategory({ category: category.category }))
+                }
                 className="group relative cursor-pointer"
                 onMouseEnter={() => setHoveredIndex(index)}
                 onMouseLeave={() => setHoveredIndex(null)}
-                onClick={() => handleCategoryClick(category.category)}
               >
                 {/* Background hover layer */}
                 <div className="absolute inset-0 bg-white/80 backdrop-blur-sm rounded-3xl shadow-lg group-hover:shadow-2xl transition-all duration-700 transform group-hover:scale-[1.02] border border-[--main-color]/20 group-hover:border-[--main-color]/50">
@@ -60,34 +64,34 @@ export default function CategoriesSection() {
                 </div>
 
                 {/* Card Content */}
-                <Link to={"/business-details"}>
-                  <div className="relative p-8 text-center h-full flex flex-col justify-center min-h-[200px] z-10">
-                    <div className="relative mb-6">
-                      <div className="relative inline-block">
-                        <div className="absolute inset-0 bg-gradient-to-br from-[#e6f0f9] to-[#e6f0f9] rounded-2xl transform group-hover:scale-110 transition-transform duration-500 opacity-0 group-hover:opacity-100 -m-3"></div>
-                        <div className="text-4xl transform group-hover:scale-110 transition-all duration-500 relative z-10 group-hover:-translate-y-1">
-                          {category.icon}
-                        </div>
+                {/* <Link to={"/business-details"}> */}
+                <div className="relative p-8 text-center h-full flex flex-col justify-center min-h-[200px] z-10">
+                  <div className="relative mb-6">
+                    <div className="relative inline-block">
+                      <div className="absolute inset-0 bg-gradient-to-br from-[#e6f0f9] to-[#e6f0f9] rounded-2xl transform group-hover:scale-110 transition-transform duration-500 opacity-0 group-hover:opacity-100 -m-3"></div>
+                      <div className="text-4xl transform group-hover:scale-110 transition-all duration-500 relative z-10 group-hover:-translate-y-1">
+                        {category.icon}
                       </div>
-                      {hoveredIndex === index && (
-                        <div className="absolute inset-0 -m-4">
-                          <div className="w-full h-full border border-[--main-color]/30 rounded-full animate-ping opacity-40"></div>
-                        </div>
-                      )}
                     </div>
-
-                    <h3 className="text-lg font-medium text-[--main-color] group-hover:text-[#0d4b8c] transition-all duration-500 mb-3 leading-tight">
-                      {category.category}
-                    </h3>
-                    <p className="text-sm text-gray-600 group-hover:text-gray-700 transition-colors duration-500 leading-relaxed font-medium">
-                      {category.subcategories.join(", ")}
-                    </p>
-
-                    {/* Bottom hover bar */}
-                    <div className="absolute bottom-0 left-4 right-4 h-0.5 bg-gradient-to-r from-[--main-color] to-[#4a90e2] transform scale-x-0 group-hover:scale-x-100 transition-transform duration-700 rounded-full"></div>
+                    {hoveredIndex === index && (
+                      <div className="absolute inset-0 -m-4">
+                        <div className="w-full h-full border border-[--main-color]/30 rounded-full animate-ping opacity-40"></div>
+                      </div>
+                    )}
                   </div>
-                </Link>
-              </div>
+
+                  <h3 className="text-lg font-medium text-[--main-color] group-hover:text-[#0d4b8c] transition-all duration-500 mb-3 leading-tight">
+                    {category.category}
+                  </h3>
+                  <p className="text-sm text-gray-600 group-hover:text-gray-700 transition-colors duration-500 leading-relaxed font-medium">
+                    {category.subcategories.join(", ")}
+                  </p>
+
+                  {/* Bottom hover bar */}
+                  <div className="absolute bottom-0 left-4 right-4 h-0.5 bg-gradient-to-r from-[--main-color] to-[#4a90e2] transform scale-x-0 group-hover:scale-x-100 transition-transform duration-700 rounded-full"></div>
+                </div>
+                {/* </Link> */}
+              </Link>
             ))}
           </div>
         </div>

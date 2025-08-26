@@ -25,7 +25,7 @@ const FeatureViewAllBusiness = () => {
                     {featureBusiness?.map((business) => (
                         <div
                             key={business.id}
-                            className="relative bg-white rounded-xl shadow-md hover:shadow-2xl overflow-hidden transition-all duration-300 hover:-translate-y-1 hover:scale-[1.03] hover:border hover:border-blue-300"
+                            className="relative bg-white px-2 py-2 rounded-xl shadow-md hover:shadow-2xl overflow-hidden transition-all duration-300 hover:-translate-y-1 hover:scale-[1.03] hover:border hover:border-blue-300"
                         >
                             {/* Image Section */}
                             <div className="relative border-b border-blue-300">
@@ -55,7 +55,7 @@ const FeatureViewAllBusiness = () => {
                                             },
                                         })
                                     }
-                                    className="inline-block bg-[--main-color] text-white px-3 sm:px-4 py-1.5 rounded-full font-poppins font-medium text-sm hover:bg-[#2b81d6] focus:outline-none focus:ring-2 focus:ring-[--main-color] transition-all duration-200"
+                                    className="inline-block bg-[--main-color] text-white px-3 sm:px-4 py-1.5 rounded-sm hover:rounded-full font-poppins font-medium text-sm hover:bg-[#2b81d6] focus:outline-none focus:ring-2 focus:ring-[--main-color] transition-all duration-200"
                                 >
                                     Explore Now
                                 </button>

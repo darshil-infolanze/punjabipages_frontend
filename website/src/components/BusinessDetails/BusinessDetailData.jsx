@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import {
   ArrowLeft,
   Star,
@@ -86,6 +86,8 @@ const BusinessDetailData = () => {
   const [selectedImage, setSelectedImage] = useState(0);
   const navigate = useNavigate();
   const [galleryImages, setGalleryImages] = useState([]);
+  const [isLightboxOpen, setIsLightboxOpen] = useState(false);
+  const thumbsRef = useRef([]);
 
   useEffect(() => {
     if (business?.gallery?.length > 0) {
@@ -93,6 +95,34 @@ const BusinessDetailData = () => {
     }
   }, [business]);
 
+  useEffect(() => {
+    if (!isLightboxOpen) return;
+
+
+    const handleKey = (e) => {
+      if (e.key === "Escape") {
+        setIsLightboxOpen(false);
+      } else if (e.key === "ArrowLeft") {
+        setSelectedImage((s) => (galleryImages.length ? (s - 1 + galleryImages.length) % galleryImages.length : s));
+      } else if (e.key === "ArrowRight") {
+        setSelectedImage((s) => (galleryImages.length ? (s + 1) % galleryImages.length : s));
+      }
+    };
+
+
+    window.addEventListener("keydown", handleKey);
+    return () => window.removeEventListener("keydown", handleKey);
+  }, [isLightboxOpen, galleryImages.length]);
+
+
+  // Scroll selected thumbnail into view when lightbox open and selectedImage changes
+  useEffect(() => {
+    if (!isLightboxOpen) return;
+    const el = thumbsRef.current[selectedImage];
+    if (el && typeof el.scrollIntoView === "function") {
+      el.scrollIntoView({ behavior: "smooth", inline: "center", block: "nearest" });
+    }
+  }, [selectedImage, isLightboxOpen]);
 
   const onBack = () => {
     navigate(-1);
@@ -100,6 +130,19 @@ const BusinessDetailData = () => {
 
   const coordinates = business?.location?.coordinates || [];
   const [longitude, latitude] = coordinates;
+
+  const openLightbox = (index) => {
+    setSelectedImage(index);
+    setIsLightboxOpen(true);
+  };
+
+  const prevImage = () => {
+    setSelectedImage((s) => (galleryImages.length ? (s - 1 + galleryImages.length) % galleryImages.length : s));
+  };
+
+  const nextImage = () => {
+    setSelectedImage((s) => (galleryImages.length ? (s + 1) % galleryImages.length : s));
+  };
 
   return (
     <div>
@@ -295,14 +338,13 @@ const BusinessDetailData = () => {
                 )}
 
                 {/* Gallery Grid */}
-                {/* Gallery Grid */}
                 <div className="w-full">
                   <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4">
                     {galleryImages?.map((image, index) => (
                       <div
                         key={index}
                         className="relative w-full aspect-video rounded-xl overflow-hidden shadow-sm group cursor-pointer"
-                        onClick={() => setSelectedImage(index)}
+                        onClick={() => openLightbox(index)}
                       >
                         <img
                           src={image || "/placeholder.svg"}
@@ -315,6 +357,62 @@ const BusinessDetailData = () => {
                     ))}
                   </div>
                 </div>
+                {isLightboxOpen && (
+                  <div
+                    className="fixed inset-0 bg-black/80 z-50 flex flex-col items-center justify-center p-6"
+                    onClick={() => setIsLightboxOpen(false)}
+                    role="dialog"
+                    aria-modal="true"
+                  >
+                    <div
+                      className="w-full max-w-5xl"
+                      onClick={(e) => e.stopPropagation()}
+                    >
+                      <button
+                        onClick={() => setIsLightboxOpen(false)}
+                        className="absolute top-4 right-4 text-white text-2xl font-bold z-60"
+                        aria-label="Close gallery"
+                      >
+                        ✕
+                      </button>
+                      <div className="relative bg-black/0 rounded-lg flex items-center justify-center">
+                        <img
+                          src={galleryImages[selectedImage] || "/placeholder.svg"}
+                          alt={`Selected ${selectedImage + 1}`}
+                          className="w-full max-h-[70vh] object-contain rounded-lg shadow-lg"
+                        />
+                        <button
+                          onClick={prevImage}
+                          className="absolute left-2 top-1/2 -translate-y-1/2 bg-black/30 hover:bg-black/50 text-white px-3 py-2 rounded-md"
+                          aria-label="Previous image"
+                        >‹</button>
+                        <button
+                          onClick={nextImage}
+                          className="absolute right-2 top-1/2 -translate-y-1/2 bg-black/30 hover:bg-black/50 text-white px-3 py-2 rounded-md"
+                          aria-label="Next image"
+                        >
+                          ›
+                        </button>
+                        <div className="absolute left-1/2 -translate-x-1/2 bottom-3 text-white text-sm bg-black/30 px-3 py-1 rounded">
+                          {selectedImage + 1} / {galleryImages.length}
+                        </div>
+                      </div>
+                      <div className="mt-4 w-full overflow-x-auto flex gap-4 items-center pb-2">
+                        {galleryImages.map((img, idx) => (
+                          <div
+                            key={idx}
+                            ref={(el) => (thumbsRef.current[idx] = el)}
+                            onClick={() => setSelectedImage(idx)}
+                            className={`flex-shrink-0 h-24 w-32 rounded-lg overflow-hidden cursor-pointer transition-all duration-200 ${idx === selectedImage ? "opacity-100 border-4 border-white" : "opacity-50 hover:opacity-80"
+                              }`}
+                          >
+                            <img src={img || "/placeholder.svg"} alt={`thumb-${idx}`} className="w-full h-full object-cover" />
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+                )}
               </div>
 
 

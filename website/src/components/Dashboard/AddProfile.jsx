@@ -1404,7 +1404,7 @@ const AddProfile = () => {
                                 )}
 
                                 <p className="text-xs text-gray-500 mt-1">
-                                    Only 1 video can be uploaded.(100MB)
+                                    Only 1 video can be uploaded.(300MB)
                                 </p>
                             </section>
 

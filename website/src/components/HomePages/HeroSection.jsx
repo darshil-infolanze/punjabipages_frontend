@@ -26,14 +26,14 @@ export function HeroSection() {
 
   const handleSearch = async () => {
     if (!searchTerm.trim() && !selectedCity.trim()) return;
-  
+
     await dispatch(
       getBusinessCategory({
         keyword: searchTerm,
         city: selectedCity
       })
     );
-  
+
     navigate("/business-details", {
       state: {
         selectedCategory: searchTerm,
@@ -41,7 +41,7 @@ export function HeroSection() {
       }
     });
   };
-  
+
 
 
   return (
@@ -111,14 +111,23 @@ export function HeroSection() {
                 </div>
               </div>
             </div>
-            <Button
-              onClick={handleSearch}
-              className="p-0"
-            >
-              <Link to={"/business-details"}>
-                <div
-                  className="bg-blue-600 hover:bg-blue-700 text-white flex items-center gap-2 px-8 py-3 rounded-md transition-colors w-full md:w-auto font-medium"
-                >
+            <Button className="p-0">
+              <Link
+                to="/business-details"
+                state={{
+                  selectedCategory: searchTerm,
+                  location: selectedCity
+                }}
+                onClick={() => {
+                  dispatch(
+                    getBusinessCategory({
+                      keyword: searchTerm,
+                      city: selectedCity
+                    })
+                  );
+                }}
+              >
+                <div className="bg-blue-600 hover:bg-blue-700 text-white flex items-center gap-2 px-8 py-3 rounded-md transition-colors w-full md:w-auto font-medium">
                   <Search className="h-4 w-4" />
                   <span>Search</span>
                 </div>

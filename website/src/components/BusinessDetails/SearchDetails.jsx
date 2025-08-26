@@ -1,11 +1,12 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Filter, Star, Phone, Mail, Clock, CheckCircle } from "lucide-react";
-import { Link, useLocation } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useSelector } from "react-redux";
 import FullPageLoader from "../Loader/Loader";
 
 const SearchDetails = () => {
   const location = useLocation();
+  const navigate = useNavigate();
   const selectedCategory = location.state?.selectedCategory;
 
   const { BusinessCategory, loading } = useSelector((state) => state.business);
@@ -15,6 +16,12 @@ const SearchDetails = () => {
   const businesses = BusinessCategory?.businesses || [];
   console.log("business", businesses);
 
+  useEffect(() => {
+    if (!location.state) {
+      navigate("/", { replace: true });
+    }
+  }, [location.state, navigate]);
+  
 
   return (
     <div className="min-h-screen bg-gray-50">
