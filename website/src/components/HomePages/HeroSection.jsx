@@ -5,50 +5,56 @@ import { Link, useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { useEffect, useState } from "react";
 import { getBusinessCategory, getCities } from "../../redux/features/businessSlice";
-import { unwrapResult } from "@reduxjs/toolkit";
 
 export function HeroSection() {
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
-  const { cities } = useSelector((state) => state.business);
+  const { cities, BusinessCategory } = useSelector((state) => state.business);
 
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedCity, setSelectedCity] = useState("");
-
+  const [suggestions, setSuggestions] = useState([]); // new state
+  const [showSuggestions, setShowSuggestions] = useState(false);
 
   useEffect(() => {
     dispatch(getCities());
-  }, []);
+  }, [dispatch]);
 
+  // Fetch suggestions while typing
+  useEffect(() => {
+    const delayDebounce = setTimeout(() => {
+      if (searchTerm.trim().length > 1) {
+        dispatch(getBusinessCategory({ keyword: searchTerm, city: selectedCity }))
+          .unwrap()
+          .then((res) => {
+            setSuggestions(res.data?.businesses || []);
+            setShowSuggestions(true);
+          })
+          .catch(() => setSuggestions([]));
+      } else {
+        setSuggestions([]);
+        setShowSuggestions(false);
+      }
+    }, 300); // debounce API call
 
-  // console.log("cities", cities);
+    return () => clearTimeout(delayDebounce);
+  }, [searchTerm, selectedCity, dispatch]);
 
-  const handleSearch = async () => {
+  const handleSearch = () => {
     if (!searchTerm.trim() && !selectedCity.trim()) return;
 
-    await dispatch(
-      getBusinessCategory({
-        keyword: searchTerm,
-        city: selectedCity
-      })
-    );
-
+    dispatch(getBusinessCategory({ keyword: searchTerm, city: selectedCity }));
     navigate("/business-details", {
-      state: {
-        selectedCategory: searchTerm,
-        location: selectedCity
-      }
+      state: { selectedCategory: searchTerm, location: selectedCity },
     });
   };
-
-
 
   return (
     <section
       className="relative min-h-[150px] sm:min-h-[200px] md:min-h-[300px] flex items-center justify-center bg-cover bg-no-repeat bg-[center_top_21%] py-8 sm:py-12 md:py-20"
       style={{
-        backgroundImage: `linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)), url(${heroimage})`,
+        backgroundImage: `linear-gradient(rgba(0,0,0,0.5), rgba(0,0,0,0.5)), url(${heroimage})`,
       }}
     >
       <div className="container mx-auto px-4 text-center text-white max-w-7xl">
@@ -65,8 +71,10 @@ export function HeroSection() {
 
         {/* Search Section */}
         <div className="max-w-3xl mx-auto bg-white rounded-lg p-4 sm:p-6 shadow-xl">
-          <div className="flex flex-col md:flex-row gap-4 items-end">
-            <div className="flex-1 w-full">
+          <div className="flex flex-col md:flex-row gap-4 items-end relative">
+
+            {/* Search Input with suggestions */}
+            <div className="flex-1 w-full relative">
               <label className="text-xs sm:text-sm text-gray-600 mb-1 sm:mb-2 block text-left">
                 What are you looking for?
               </label>
@@ -75,63 +83,79 @@ export function HeroSection() {
                 placeholder="Search for businesses, services..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
+                onFocus={() => suggestions.length && setShowSuggestions(true)}
+                onBlur={() => setTimeout(() => setShowSuggestions(false), 200)} 
                 className="w-full rounded-md border border-gray-300 text-black bg-white px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
               />
+
+              {/* Suggestions Dropdown */}
+              {showSuggestions && suggestions.length > 0 && (
+                <ul className="absolute z-20 w-full bg-white border border-gray-200 rounded-md shadow-lg mt-1 max-h-72 overflow-auto text-left">
+                  {suggestions.map((biz) => (
+                    <li
+                      key={biz._id}
+                      onClick={() => {
+                        setSearchTerm(biz.businessName);   
+                        setShowSuggestions(false);      
+                      }}
+                      className="flex items-center gap-3 px-3 py-2 cursor-pointer hover:bg-gray-100"
+                    >
+                      {/* Logo */}
+                      {biz.logoUrl ? (
+                        <img
+                          src={biz.logoUrl}
+                          alt={biz.businessName}
+                          className="h-8 w-8 rounded-full object-cover border"
+                        />
+                      ) : (
+                        <div className="h-8 w-8 rounded-full bg-gray-300 flex items-center justify-center text-xs text-gray-600">
+                          {biz.businessName?.charAt(0)}
+                        </div>
+                      )}
+
+                      {/* Business Info */}
+                      <div className="flex-1">
+                        <p className="text-sm font-medium text-gray-900">{biz.businessName}</p>
+                        {/* <p className="text-xs text-gray-500">
+                          {biz.category} • {biz.subCategory}
+                        </p>
+                        <p className="text-xs text-gray-400">{biz.address?.city}</p> */}
+                      </div>
+                    </li>
+                  ))}
+                </ul>
+              )}
             </div>
 
+            {/* City Select */}
             <div className="flex-1 w-full">
               <label className="text-xs sm:text-sm text-gray-600 mb-1 sm:mb-2 block text-left">
                 Location
               </label>
-              <div className="relative">
-                <select
-                  className="w-full appearance-none rounded-md border border-gray-300 bg-white px-3 py-2 text-black text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                  value={selectedCity}
-                  onChange={(e) => setSelectedCity(e.target.value)}
-                >
-                  <option value="" disabled>
-                    Select Location
-                  </option>
-
-                  {Array.isArray(cities) &&
-                    cities.map((city) => (
-                      <option key={city} value={city}>
-                        {city}
-                      </option>
-                    ))}
-                </select>
-                <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700">
-                  <svg
-                    className="fill-current h-4 w-4"
-                    xmlns="http://www.w3.org/2000/svg"
-                    viewBox="0 0 20 20"
-                  >
-                    <path d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z" />
-                  </svg>
-                </div>
-              </div>
-            </div>
-            <Button className="p-0">
-              <Link
-                to="/business-details"
-                state={{
-                  selectedCategory: searchTerm,
-                  location: selectedCity
-                }}
-                onClick={() => {
-                  dispatch(
-                    getBusinessCategory({
-                      keyword: searchTerm,
-                      city: selectedCity
-                    })
-                  );
-                }}
+              <select
+                className="w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-black text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                value={selectedCity}
+                onChange={(e) => setSelectedCity(e.target.value)}
               >
-                <div className="bg-blue-600 hover:bg-blue-700 text-white flex items-center gap-2 px-8 py-3 rounded-md transition-colors w-full md:w-auto font-medium">
-                  <Search className="h-4 w-4" />
-                  <span>Search</span>
-                </div>
-              </Link>
+                <option value="" disabled>Select Location</option>
+                {Array.isArray(cities) &&
+                  cities.map((city) => (
+                    <option key={city} value={city}>
+                      {city}
+                    </option>
+                  ))}
+              </select>
+            </div>
+
+            {/* Search Button */}
+            <Button className="p-0">
+              <div
+                onClick={handleSearch}
+                className="bg-blue-600 hover:bg-blue-700 text-white flex items-center gap-2 px-8 py-3 rounded-md transition-colors w-full md:w-auto font-medium"
+              >
+                <Search className="h-4 w-4" />
+                <span>Search</span>
+              </div>
             </Button>
           </div>
         </div>
