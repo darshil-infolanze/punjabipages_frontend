@@ -90,7 +90,7 @@ export function HeroSection() {
 
               {/* Suggestions Dropdown */}
               {showSuggestions && suggestions.length > 0 && (
-                <ul className="absolute z-20 w-full bg-white border border-gray-200 rounded-md shadow-lg mt-1 max-h-72 overflow-auto text-left">
+                <ul className="absolute z-20 w-full bg-white border border-gray-200 rounded-md shadow-lg mt-1 max-h-56 overflow-auto text-left">
                   {suggestions.map((biz) => (
                     <li
                       key={biz._id}

@@ -1,5 +1,5 @@
 import { Search, ChevronDown } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Input } from "../components/ui/input";
 import {
   Select,
@@ -81,21 +81,42 @@ const cityCategories = {
 const Categories = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
+  const inputRef = useRef(null);
   const [loading, setLoading] = useState(false);
 
-  const { cities } = useSelector((state) => state.business);
+  const { cities, BusinessCategory } = useSelector((state) => state.business);
 
   const [searchTerm, setSearchTerm] = useState("");
-  const [selectedLocation, setSelectedLocation] = useState("");
   const [selectedCity, setSelectedCity] = useState("");
+  const [suggestions, setSuggestions] = useState([]); // new state
+  const [showSuggestions, setShowSuggestions] = useState(false);
 
   useEffect(() => {
     dispatch(getCities());
-  }, []);
+  }, [dispatch]);
 
-  const handleSearch = async () => {
+  useEffect(() => {
+    const delayDebounce = setTimeout(() => {
+      if (searchTerm.trim().length > 1) {
+        dispatch(getBusinessCategory({ keyword: searchTerm, city: selectedCity }))
+          .unwrap()
+          .then((res) => {
+            setSuggestions(res.data?.businesses || []);
+            setShowSuggestions(true);
+          })
+          .catch(() => setSuggestions([]));
+      } else {
+        setSuggestions([]);
+        setShowSuggestions(false);
+      }
+    }, 300); // debounce API call
+
+    return () => clearTimeout(delayDebounce);
+  }, [searchTerm, selectedCity, dispatch]);
+
+  const handleSearch = () => {
     if (!searchTerm.trim() && !selectedCity.trim()) return;
-    await dispatch(
+    dispatch(
       getBusinessCategory({
         keyword: searchTerm,
         city: selectedCity,
@@ -171,7 +192,7 @@ const Categories = () => {
   return (
     <div className="min-h-screen bg-white">
       {/* Search Section */}
-      <section className="relative py-16 bg-[--main-color] overflow-hidden text-white border-b">
+      <section className="relative py-16 bg-[--main-color] overflow-visible text-white border-b">
         {/* Decorative SVG Background */}
         <div className="absolute inset-0 w-full h-full pointer-events-none">
           <svg
@@ -202,7 +223,7 @@ const Categories = () => {
           <div className="bg-white rounded-lg p-6 shadow-lg text-black">
             <div className="flex flex-col md:flex-row gap-4 items-end">
               {/* Search input */}
-              <div className="flex-1">
+              <div className="flex-1 relative">
                 <label className="text-sm text-gray-600 mb-2 block text-left">
                   What are you looking for?
                 </label>
@@ -211,8 +232,39 @@ const Categories = () => {
                   placeholder="Search for businesses, services..."
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
+                  onFocus={() => suggestions.length && setShowSuggestions(true)}
+                  onBlur={() => setTimeout(() => setShowSuggestions(false), 200)}
                   className="w-full px-4 py-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
                 />
+                {showSuggestions && suggestions.length > 0 && (
+                  <ul className="absolute z-50 w-full bg-white border border-gray-200 rounded-md shadow-lg mt-1 max-h-52 overflow-auto text-left">
+                    {suggestions.map((biz) => (
+                      <li
+                        key={biz._id}
+                        onClick={() => {
+                          setSearchTerm(biz.businessName);
+                          setShowSuggestions(false);
+                        }}
+                        className="flex items-center gap-3 px-3 py-2 cursor-pointer hover:bg-gray-100"
+                      >
+                        {biz.logoUrl ? (
+                          <img
+                            src={biz.logoUrl}
+                            alt={biz.businessName}
+                            className="h-8 w-8 rounded-full object-cover border"
+                          />
+                        ) : (
+                          <div className="h-8 w-8 rounded-full bg-gray-300 flex items-center justify-center text-xs text-gray-600">
+                            {biz.businessName?.charAt(0)}
+                          </div>
+                        )}
+                        <div className="flex-1">
+                          <p className="text-sm font-medium text-gray-900">{biz.businessName}</p>
+                        </div>
+                      </li>
+                    ))}
+                  </ul>
+                )}
               </div>
 
               {/* City Dropdown */}
@@ -243,12 +295,10 @@ const Categories = () => {
 
               {/* Search Button */}
               <Button onClick={handleSearch} className="p-0">
-                <Link to={"/business-details"}>
-                  <div className="bg-blue-600 hover:bg-blue-700 text-white flex items-center gap-2 px-8 py-3 rounded-md transition-colors w-full md:w-auto font-medium">
-                    <Search className="h-4 w-4" />
-                    <span>Search</span>
-                  </div>
-                </Link>
+                <div className="bg-blue-600 hover:bg-blue-700 text-white flex items-center gap-2 px-8 py-3 rounded-md transition-colors w-full md:w-auto font-medium">
+                  <Search className="h-4 w-4" />
+                  <span>Search</span>
+                </div>
               </Button>
             </div>
           </div>
