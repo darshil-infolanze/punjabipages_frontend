@@ -9,6 +9,7 @@ import {
   ChevronsRight,
 } from "lucide-react";
 import logo from "../../assets/logo.jpeg";
+import { Link } from "react-router-dom";
 
 export function Footer() {
   return (
@@ -207,7 +208,7 @@ export function Footer() {
             </div>
 
             {/* Social & Contact Column */}
-            <div> 
+            <div>
               <h3 className="text-xl font-bold text-white mb-6">Connect</h3>
               <ul className="space-y-3 mb-6">
                 <li>
@@ -350,18 +351,18 @@ export function Footer() {
             </div>
 
             <div className="flex gap-4">
-              <a
-                href="#"
+              <Link
+                to="/privacypolicy"
                 className="text-gray-400 hover:text-white transition-colors text-sm"
               >
                 Privacy Policy
-              </a>
-              <a
-                href="#"
+              </Link>
+              <Link
+                to="/terms&condition"
                 className="text-gray-400 hover:text-white transition-colors text-sm"
               >
-                Terms of Service
-              </a>
+                Terms & Conditions
+              </Link>
             </div>
           </div>
         </div>

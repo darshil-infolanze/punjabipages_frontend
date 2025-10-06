@@ -22,6 +22,8 @@ import ForgotPassword from "./components/Auth/ForgotPassword";
 import ResetPassword from "./components/Auth/ResetPassword";
 import DeleteAccountPage from "./components/Dashboard/DeleteAccountPage";
 import FeatureViewAllBusiness from "./components/BusinessDetails/FeatureViewAllBusiness";
+import TermsCondition from "./components/Footer/TermsCondition";
+import PrivacyPolicy from "./components/Footer/PrivacyPolicy";
 
 // ✅ Wrapper for handling scroll-to-top on route change
 function ScrollToTopWrapper() {
@@ -50,6 +52,8 @@ function ScrollToTopWrapper() {
         <Route path="/forgot-password" element={<ForgotPassword />} />
         <Route path="/reset-password" element={<ResetPassword />} />
         <Route path="/featured-businesses" element={<FeatureViewAllBusiness />} />
+        <Route path="/terms&condition" element={<TermsCondition />} />
+        <Route path="/privacypolicy" element={<PrivacyPolicy />} />
       </Route>
 
       {/* Private Routes */}
