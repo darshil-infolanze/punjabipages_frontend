@@ -686,7 +686,7 @@ const AddProfile = () => {
                                             <option value="">Select an Established Year</option>
                                             {Array.from({ length: 2028 - 2000 + 1 }, (_, i) => (
                                                 <option key={i} value={2000 + i}>
-                                                    {2000 + i}
+                                                    {1996 + i}
                                                 </option>
                                             ))}
                                         </select>
