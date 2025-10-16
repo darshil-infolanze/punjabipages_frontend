@@ -1,6 +1,6 @@
 import React from "react";
 import { NavLink, useNavigate } from "react-router-dom";
-import { FaBuilding, FaUsers } from "react-icons/fa";
+import { FaBuilding, FaCloudUploadAlt, FaUsers } from "react-icons/fa";
 import logo from "../assets/logo.jpeg";
 import { Typography } from "@material-tailwind/react";
 import { IoLogOutOutline } from "react-icons/io5";
@@ -10,6 +10,7 @@ import { logout } from "../redux/features/authSlice";
 const navItems = [
   { name: "Business", to: "/business", icon: <FaBuilding /> },
   // { name: "Users", to: "/users", icon: <FaUsers /> },
+  { name: "Bulk Upload", to: "/bulkUpload", icon:<FaCloudUploadAlt /> },
 ];
 
 const Sidebar = ({ isOpen, onClose }) => {

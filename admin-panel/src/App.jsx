@@ -14,6 +14,7 @@
   import { PersistGate } from "redux-persist/integration/react";
   import { persistor, store } from "./redux/store";
   import { setupAxiosInterceptors } from "./redux/axiosConfig";
+import BulkUpload from "./pages/BulkUpload/BulkUpload";
 
   // Set up axios interceptors with the store
   setupAxiosInterceptors(store);
@@ -33,6 +34,7 @@
               <Route element={<PrivateLayout />}>
                 <Route path="/business" element={<Business />} />
                 <Route path="/users" element={<Users />} />
+                <Route path="/bulkUpload" element={<BulkUpload />} />
               </Route>
             </Routes>
 
