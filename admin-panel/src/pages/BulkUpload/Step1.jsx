@@ -2,6 +2,7 @@ import React, { useState } from "react";
 // import { InboxOutlined, DeleteOutlined } from "@ant-design/icons";
 import { message, Upload, Button } from "antd";
 import { readExcelFile } from "../../utils/utils";
+import { toast } from "react-toastify";
 
 const { Dragger } = Upload;
 
@@ -15,6 +16,7 @@ function Step1({ setButtonLoading, setFile }) {
     const maxSize = 2 * 1024 * 1024;
     if (selectedFile.size > maxSize) {
       setButtonLoading(false);
+      toast.error("File size must be less than 2MB");
       message.error("File size must be less than 2MB");
       return false;
     }
@@ -23,6 +25,7 @@ function Step1({ setButtonLoading, setFile }) {
     if (!isExcel) {
       setButtonLoading(false);
       message.error("Invalid file type. Please upload a CSV or Excel file.");
+      toast.error("Invalid file type. Please upload a CSV or Excel file.");
       return false;
     }
 
@@ -32,6 +35,7 @@ function Step1({ setButtonLoading, setFile }) {
       setFileName(selectedFile.name);
       setButtonLoading(false);
       message.success(`${selectedFile.name} uploaded successfully`);
+      toast.success(`${selectedFile.name} uploaded successfully`);
     } catch (error) {
       setButtonLoading(false);
       message.error("Error processing the file.");

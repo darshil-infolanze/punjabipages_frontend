@@ -10,21 +10,23 @@ import Step3 from './Step3';
 import { toast } from "react-toastify";
 import { customerFields } from "./data";
 import { validateRecords } from "../../utils/utils";
+import { bulkUpload } from "../../redux/features/businessSlice";
+// import pdf  from "../../../public/Business_Bulk_Upload_Template.xlsx"
 
 const validationSchema = Yup.object({
+  // owner: Yup.string().required("Owner is required"),
   businessName: Yup.string().required("Business Name is required"),
   category: Yup.string().required("category is required"),
   subCategory: Yup.string().required("SubCategory  is required"),
   description: Yup.string().required("Description is required"),
   establishedYear: Yup.string().required("Established Year is required"),
-  phone: Yup.string().required("Phone is required"),
-  address: Yup.object().shape({
-    street: Yup.string().required("Address Street is required"),
-    suburb: Yup.string().required("Address Suburb is required"),
-    city: Yup.string().required("Address City is required"),
-    state: Yup.string().required("Address State is required"),
-    postcode: Yup.string().required("Address PostCode is required"),
-  }),
+  phone: Yup.number().required("Phone is required"),
+  "address.street": Yup.string().required("Address Street is required"),
+  "address.suburb": Yup.string().required("Address Suburb is required"),
+  "address.city": Yup.string().required("Address City is required"),
+  "address.state": Yup.string().required("Address State is required"),
+  "address.postcode": Yup.string().required("Address PostCode is required"),
+
   serviceAreas: Yup.string().required("Service Areas is required"),
   services: Yup.string().required("Services  is required"),
 });
@@ -36,7 +38,9 @@ function BulkUpload() {
   const [errors, setErrors] = useState({});
   const [record, setRecord] = useState(null);
   const [buttonLoading, setButtonLoading] = useState(false);
-  const companyId = useSelector((state) => state.auth.companyId);
+  const user = useSelector((state) => state.auth.user);
+
+
 
   const navigate = useNavigate();
   const dispatch = useDispatch();
@@ -75,6 +79,13 @@ function BulkUpload() {
     if (validateSteps(current)) {
       setCurrent(value);
     }
+  };
+
+   const handleDownload = () => {
+    const link = document.createElement("a");
+    link.href = "/Business_Bulk_Upload_Template.xlsx";
+    link.download = "Bulk-upload-template.xlsx";
+    link.click();
   };
 
   async function processRecords(current, file, mapping) {
@@ -124,42 +135,107 @@ function BulkUpload() {
     setButtonLoading(true);
 
     try {
-      let input = [];
       const validRecords = record?.validRecords ?? [];
+      console.log("validRecords", validRecords);
 
-      validRecords?.forEach((item) => {
-        const preperedData = {
-          ...(!itemId && { companyId }),
-          description: item.description,
-          itemName: item.itemName,
-          itemType: item.itemType,
-          itemModelNo: item.itemModelNo,
-          itemGroup: item.itemGroup,
-          defaultPrice: item.defaultPrice,
-          itemStatus: item.itemStatus == "Active",
-          gst: item.itemGstTax,
-          hsnCode: item.hsnCode,
-        };
+      const businesses = validRecords.map((item) => ({
+        owner: user?.id,
+        businessName: item.businessName,
+        abn: item.abn,
+        category: item.category,
+        subCategory: item.subCategory,
+        description: item.description,
+        establishedYear: item.establishedYear,
+        contactPerson: item.contactPerson,
+        phone: item.phone,
+        email: item.email,
+        website: item.website,
+        alternateContacts: {
+          phone: item["alternateContacts.phone"],
+          email: item["alternateContacts.email"],
+        },
+        address: {
+          street: item["address.street"],
+          suburb: item["address.suburb"],
+          city: item["address.city"],
+          state: item["address.state"],
+          postcode: item["address.postcode"],
+        },
+        location: {
+          type: "Point",
+          coordinates: [item.longitude || 0, item.latitude || 0],
+        },
+        serviceAreas: item.serviceAreas ? item.serviceAreas.split(",") : [],
+        hours: {
+          monday: {
+            open: item["monday.open"],
+            close: item["monday.close"],
+          },
+          tuesday: {
+            open: item["tuesday.open"],
+            close: item["tuesday.close"],
+          },
+          wednesday: {
+            open: item["wednesday.open"],
+            close: item["wednesday.close"],
+          },
+          thursday: {
+            open: item["thursday.open"],
+            close: item["thursday.close"],
+          },
+          friday: {
+            open: item["friday.open"],
+            close: item["friday.close"],
+          },
+          saturday: {
+            open: item["saturday.open"],
+            close: item["saturday.close"],
+          },
+          sunday: {
+            open: item["sunday.open"],
+            close: item["sunday.close"],
+          },
+          publicHolidayNotes: item.publicHolidayNotes || "",
+          is24x7:
+            item.is24x7?.toString().toLowerCase() === "true" ||
+            item.is24x7 === "1" ||
+            item.is24x7 === true,
+        },
+        logoUrl: item.logoUrl,
+        gallery: item.gallery || [],
+        introVideo: item.introVideo,
+        socialLinks: {
+          facebook: item.facebook,
+          instagram: item.instagram,
+          linkedin: item.linkedin,
+          others: item["socialLinks.others"]
+            ? item["socialLinks.others"].split(",").map(s => s.trim())
+            : [],
+        },
+        keywords: item.keywords ? item.keywords.split(",") : [],
+        services: item.services ? item.services.split(",") : [],
+        paymentMethods: item.paymentMethods
+          ? item.paymentMethods.split(",")
+          : [],
+        certifications: item.certifications
+          ? item.certifications.split(",")
+          : [],
+        promotions: item.promotions,
+        status: item.status,
+        isFeature: item.isFeature || false,
+        popular: item.popular || false,
+      }));
 
-        input.push(preperedData);
-      });
-      // const payload = {
-      //   monday: {
-      //     close: input.mondayclose,
-      //     open: input.mondayOpen
-      //   }
-      // }
-      // await dispatch(
-      //   itemMasterSliceMethods.createBulkItem({
-      //     items: input,
-      //     companyId,
-      //   }),
-      // ).unwrap();
+      await dispatch(
+        bulkUpload({ businesses })
+      ).unwrap();
+
+      // toast.success(response.message || "Bulk businesses uploaded successfully!");
       navigate(-1);
-      setButtonLoading(false);
     } catch (error) {
-      console.log(error);
-
+      console.error("Bulk upload failed:", error);
+      toast.error(error?.message || "Something went wrong while uploading.");
+    } finally {
       setButtonLoading(false);
     }
   };
@@ -199,13 +275,22 @@ function BulkUpload() {
   }, [current, errors, record]);
 
   return (
-    <div className="pt-5 my-container">
-      <div className="flex justify-center">
-        <div className="text-2xl ps-2 pb-2 font-bold">Bussiness - Select File</div>
+    <div className="my-container">
+      <div className="flex justify-between items-center py-4 px-4 border-b border-gray-300 mb-8">
+        <div className="text-2xl font-bold">Bulk Bussiness Upload</div>
+        <div className="">
+          <Button
+            type="primary"
+            className="font-semibold"
+            onClick={handleDownload}
+          >
+            Download Template
+          </Button>
+        </div>
       </div>
 
       <div className="flex flex-col items-center">
-        <div className="py-2 w-2/4">
+        <div className="py-2 w-2/3">
           <BulkUploadStep current={current} onChange={onChange} key={"bulkcustomerStep"} />
           <Divider />
         </div>

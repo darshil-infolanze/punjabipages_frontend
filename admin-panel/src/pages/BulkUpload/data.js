@@ -1,4 +1,5 @@
 export const customerFields = [
+  // { id: "owner", label: "Owner", required: true },
   { id: "businessName", label: "Business Name", required: true },
   { id: "abn", label: "abn", required: false },
   { id: "category", label: "Category", required: true },
@@ -27,6 +28,8 @@ export const customerFields = [
   { id: "longitude", label: "longitude", required: false },
   { id: "latitude", label: "latitude", required: false },
   { id: "serviceAreas", label: "Service Areas", required: true },
+  { id: "services", label: "Services", required: true },
+  { id: "status", label: "Status", required: true },
   { id: "monday.open", label: "Monday Open", required: false },
   { id: "monday.close", label: "Monday Close", required: false },
   { id: "tuesday.open", label: "Tuesday Open", required: false },
@@ -50,12 +53,10 @@ export const customerFields = [
   { id: "instagram", label: "Instagram", required: false },
   { id: "linkedin", label: "Linkedin", required: false },
   { id: "others", label: "Others", required: false },
-  { id: "services", label: "Services", required: true },
   { id: "keywords", label: "Keywords", required: false },
   { id: "paymentMethods", label: "Payment Methods", required: false },
   { id: "certifications", label: "Certifications", required: false },
   { id: "promotions", label: "Promotions", required: false },
-  { id: "status", label: "Status", required: false },
   { id: "isFeature", label: "isFeature", required: false },
   { id: "popular", label: "Popular", required: false },
 ];

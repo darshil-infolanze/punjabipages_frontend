@@ -10,7 +10,6 @@ function Step2({ file, mapping, setMapping, setErrors, errors }) {
   const handleMappingChange = (customerField, selectedColumn) => {
     setMapping((prev) => ({ ...prev, [customerField]: selectedColumn }));
 
-    // Remove error if the field is now valid
     setErrors((prevErrors) => {
       const newErrors = { ...prevErrors };
       if (selectedColumn) {
@@ -20,27 +19,33 @@ function Step2({ file, mapping, setMapping, setErrors, errors }) {
     });
   };
 
+  // Split fields into pairs for 2-grid layout
+  const fieldPairs = [];
+  for (let i = 0; i < customerFields.length; i += 2) {
+    fieldPairs.push(customerFields.slice(i, i + 2));
+  }
+
   return (
-    <div>
-      {customerFields.map((field) => (
-        <Row gutter={16} className="w-full my-2" key={field.id}>
-          <Col span={12}>
-            <p className="text-md font-bold">
-              {field.label} {field.required ? <span className="text-red-500">*</span> : ""}
-            </p>
-          </Col>
-          <Col span={12}>
-            <Select
-              placeholder="Select column"
-              style={{ width: "100%" }}
-              options={options}
-              onChange={(value) => handleMappingChange(field.id, value)}
-              value={mapping[field.id] || undefined}
-              status={errors[field.id] ? "error" : ""}
-              showSearch
-            />
-            {errors[field.id] && <p className="text-red-500 text-xs">{errors[field.id]}</p>}
-          </Col>
+    <div className="space-y-4">
+      {fieldPairs.map((pair, index) => (
+        <Row gutter={16} key={index}>
+          {pair.map((field) => (
+            <Col span={12} key={field.id} className="mb-2">
+              <p className="text-md font-bold mb-1">
+                {field.label} {field.required && <span className="text-red-500">*</span>}
+              </p>
+              <Select
+                placeholder="Select column"
+                style={{ width: "100%" }}
+                options={options}
+                onChange={(value) => handleMappingChange(field.id, value)}
+                value={mapping[field.id] || undefined}
+                status={errors[field.id] ? "error" : ""}
+                showSearch
+              />
+              {errors[field.id] && <p className="text-red-500 text-xs mt-1">{errors[field.id]}</p>}
+            </Col>
+          ))}
         </Row>
       ))}
     </div>

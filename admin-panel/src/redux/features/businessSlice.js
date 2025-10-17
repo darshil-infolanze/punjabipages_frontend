@@ -88,6 +88,20 @@ export const getPopularBusiness = createAsyncThunk(
   }
 );
 
+export const bulkUpload = createAsyncThunk(
+  "business/bulkUpload",
+  async ({ businesses }) => {
+    try {
+      const response = await axiosConfig.post("admin/bulk", { businesses });
+      return response.data;
+    } catch (error) {
+      throw (
+        error.response?.data?.error || error.message || "Something went wrong"
+      );
+    }
+  }
+);
+
 // Slice
 const businessSlice = createSlice({
   name: "business",
@@ -176,6 +190,19 @@ const businessSlice = createSlice({
         // toast.success(action.payload.message);
       })
       .addCase(getPopularBusiness.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.error.message;
+        toast.error(state.error);
+      })
+      .addCase(bulkUpload.pending, (state) => {
+        state.loading = true;
+      })
+      .addCase(bulkUpload.fulfilled, (state, action) => {
+        state.loading = false;
+        state.message = action.payload.message;
+        toast.success(action.payload.message);
+      })
+      .addCase(bulkUpload.rejected, (state, action) => {
         state.loading = false;
         state.error = action.error.message;
         toast.error(state.error);
