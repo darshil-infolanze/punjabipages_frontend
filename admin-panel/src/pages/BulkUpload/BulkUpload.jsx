@@ -83,7 +83,7 @@ function BulkUpload() {
 
    const handleDownload = () => {
     const link = document.createElement("a");
-    link.href = "/Business_Bulk_Upload_Template.xlsx";
+    link.href = "/Bulk-upload-template.xlsx";
     link.download = "Bulk-upload-template.xlsx";
     link.click();
   };
